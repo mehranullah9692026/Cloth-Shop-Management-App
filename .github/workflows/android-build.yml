@@ -1,0 +1,39 @@
+
+name: Android APK and AAB Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build APK and AAB
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug bundleDebug
+
+      - name: Upload APK and AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: Android-APK-and-AAB
+          path: |
+            **/build/outputs/apk/debug/*.apk
+            **/build/outputs/bundle/debug/*.aab
+          if-no-files-found: error
